@@ -1,0 +1,31 @@
+import folium
+import pandas as pd
+from google.colab import drive
+
+# Monte Google Drive
+drive.mount('/content/drive')
+
+# Lis ton CSV
+df = pd.read_csv('/content/drive/MyDrive/aladar_data.csv')
+
+# Crée la carte centrée sur Paris
+carte = folium.Map(location=[48.8566, 2.3522], zoom_start=13)
+
+# Couleurs par catégorie
+couleurs = {
+    "nid_de_poule_leger": "orange",
+    "nid_de_poule_profond": "red",
+    "dos_ane_choc_violent": "darkred"
+}
+
+# Ajoute les marqueurs
+for _, row in df.iterrows():
+    folium.Marker(
+        location=[row['latitude'], row['longitude']],
+        popup=f"{row['categorie']} — {row['acceleration_z']}g",
+        icon=folium.Icon(color=couleurs.get(row['categorie'], 'blue'))
+    ).add_to(carte)
+
+# Sauvegarde le fichier HTML
+carte.save('/content/carte.html')
+print("Carte générée !")
